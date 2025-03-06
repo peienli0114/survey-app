@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>互動問卷（60人版）</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #timer { font-size: 24px; color: red; }
+        #question { margin: 20px; }
+        button { padding: 10px 20px; margin: 5px; }
+        .disabled { background-color: gray; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <h1>問卷調查</h1>
+    <div id="timer">剩餘時間：30秒</div>
+    <div id="question">
+        <p>你喜歡什麼顏色？</p>
+        <button id="red" onclick="answer('紅色')">紅色</button>
+        <button id="blue" onclick="answer('藍色')">藍色</button>
+        <button id="green" onclick="answer('綠色')">綠色</button>
+    </div>
+    <p>你的回答：<span id="userAnswer"></span></p>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase 配置（從 Firebase 主控台取得）
+        const firebaseConfig = {
+            apiKey: "你的API金鑰",
+            authDomain: "你的專案ID.firebaseapp.com",
+            projectId: "你的專案ID",
+            storageBucket: "你的專案ID.appspot.com",
+            messagingSenderId: "你的發送者ID",
+            appId: "你的應用ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 計時器邏輯
+        let timeLeft = 30;
+        let submitted = false;
+        const timerDisplay = document.getElementById('timer');
+        const countdown = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = `剩餘時間：${timeLeft}秒`;
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerDisplay.textContent = "時間到！";
+                document.getElementById('question').style.display = 'none';
+                if (!submitted) submitAnswer("未完成");
+            }
+        }, 1000);
+
+        // 處理回答並提交
+        function answer(choice) {
+            if (submitted) return; // 防止重複提交
+            submitted = true;
+            document.getElementById('userAnswer').textContent = choice;
+            disableButtons();
+            submitAnswer(choice);
+        }
+
+        // 提交到 Firebase
+        function submitAnswer(choice) {
+            clearInterval(countdown); // 停止計時
+            const data = {
+                answer: choice,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userId: generateUniqueId() // 為每個使用者生成簡單唯一 ID
+            };
+            db.collection('surveyResponses').add(data)
+                .then(() => {
+                    timerDisplay.textContent = "提交成功！";
+                })
+                .catch((error) => {
+                    console.error('提交失敗：', error);
+                    timerDisplay.textContent = "提交失敗，請稍後再試";
+                    submitted = false; // 允許重試
+                    enableButtons();
+                });
+        }
+
+        // 生成簡單唯一 ID（基於時間戳和隨機數）
+        function generateUniqueId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        // 禁用按鈕
+        function disableButtons() {
+            document.getElementById('red').classList.add('disabled');
+            document.getElementById('blue').classList.add('disabled');
+            document.getElementById('green').classList.add('disabled');
+        }
+
+        // 啟用按鈕（若需要重試）
+        function enableButtons() {
+            document.getElementById('red').classList.remove('disabled');
+            document.getElementById('blue').classList.remove('disabled');
+            document.getElementById('green').classList.remove('disabled');
+        }
+    </script>
+</body>
+</html>
