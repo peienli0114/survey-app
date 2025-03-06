@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>互動問卷（60人版）</title>
+    <title>互動問卷</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         #timer { font-size: 24px; color: red; }
@@ -16,7 +16,7 @@
     <div id="timer">剩餘時間：30秒</div>
     <div id="question">
         <p>你喜歡什麼顏色？</p>
-        <button id="red" onclick="answer('紅色')">紅色</button>
+        <button id="red" onclick="answer('紅色2')">紅色</button>
         <button id="blue" onclick="answer('藍色')">藍色</button>
         <button id="green" onclick="answer('綠色')">綠色</button>
     </div>
@@ -25,10 +25,9 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
-    
 
     <script>
-        // Firebase 配置（從 Firebase 主控台取得）
+        // Firebase 配置
         const firebaseConfig = {
             apiKey: "AIzaSyAEOWwZOU5eIae01cVhz2o2BI2U1jMcvgY",
             authDomain: "survey-app-b7e2b.firebaseapp.com",
@@ -36,9 +35,9 @@
             storageBucket: "survey-app-b7e2b.firebasestorage.app",
             messagingSenderId: "321835179876",
             appId: "1:321835179876:web:d89f0d1ed5e41f7a15e471"
-
         };
 
+        // 初始化 Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -72,7 +71,7 @@
             const data = {
                 answer: choice,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                userId: generateUniqueId() // 為每個使用者生成簡單唯一 ID
+                userId: generateUniqueId()
             };
             db.collection('surveyResponses').add(data)
                 .then(() => {
@@ -81,12 +80,12 @@
                 .catch((error) => {
                     console.error('提交失敗：', error);
                     timerDisplay.textContent = "提交失敗，請稍後再試";
-                    submitted = false; // 允許重試
+                    submitted = false;
                     enableButtons();
                 });
         }
 
-        // 生成簡單唯一 ID（基於時間戳和隨機數）
+        // 生成簡單唯一 ID
         function generateUniqueId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
@@ -98,7 +97,7 @@
             document.getElementById('green').classList.add('disabled');
         }
 
-        // 啟用按鈕（若需要重試）
+        // 啟用按鈕
         function enableButtons() {
             document.getElementById('red').classList.remove('disabled');
             document.getElementById('blue').classList.remove('disabled');
