@@ -25,17 +25,20 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    
 
     <script>
         // Firebase 配置（從 Firebase 主控台取得）
         const firebaseConfig = {
-            apiKey: "你的API金鑰",
-            authDomain: "你的專案ID.firebaseapp.com",
-            projectId: "你的專案ID",
-            storageBucket: "你的專案ID.appspot.com",
-            messagingSenderId: "你的發送者ID",
-            appId: "你的應用ID"
+            apiKey: "AIzaSyAEOWwZOU5eIae01cVhz2o2BI2U1jMcvgY",
+            authDomain: "survey-app-b7e2b.firebaseapp.com",
+            projectId: "survey-app-b7e2b",
+            storageBucket: "survey-app-b7e2b.firebasestorage.app",
+            messagingSenderId: "321835179876",
+            appId: "1:321835179876:web:d89f0d1ed5e41f7a15e471"
+
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
